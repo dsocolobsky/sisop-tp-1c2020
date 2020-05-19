@@ -30,6 +30,13 @@ class ListaAtomica {
 
     void insertar(const T &valor) {
         // Completar (Ejercicio 1)
+        Nodo *nuevo_nodo = new Nodo(valor);
+        nuevo_nodo->_siguiente = _cabeza.load();
+        while(true) {
+            if(_cabeza.compare_exchange_weak(nuevo_nodo->_siguiente, nuevo_nodo)) {
+                break;
+            }
+        }
     }
 
     T &cabeza() const {
@@ -88,7 +95,7 @@ class ListaAtomica {
         }
 
         bool operator==(const typename ListaAtomica::Iterador &otro) const {
-            return _lista._cabeza.load() == otro._lista._cabeza.load()
+            return _lista->_cabeza.load() == otro._lista->_cabeza.load()
                 && _nodo_sig == otro._nodo_sig;
         }
     };

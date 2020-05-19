@@ -4,6 +4,7 @@
 #include <atomic>
 #include <string>
 #include <vector>
+#include <mutex>
 
 #include "ListaAtomica.hpp"
 
@@ -25,7 +26,13 @@ class HashMapConcurrente {
  private:
     ListaAtomica<hashMapPair> *tabla[HashMapConcurrente::cantLetras];
 
+    hashMapPair* buscar(std::string clave);
+
     static unsigned int hashIndex(std::string clave);
+    
+    std::mutex hash_mutex[cantLetras];
+
+    std::mutex mutex_insercion;
 };
 
 #endif  /* HMC_HPP */
