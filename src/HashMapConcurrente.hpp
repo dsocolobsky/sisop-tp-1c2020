@@ -16,6 +16,8 @@ class HashMapConcurrente {
 
     HashMapConcurrente();
 
+    HashMapConcurrente(const HashMapConcurrente & otro){}
+
     void incrementar(std::string clave);
     std::vector<std::string> claves();
     unsigned int valor(std::string clave);
@@ -24,14 +26,14 @@ class HashMapConcurrente {
     hashMapPair maximoParalelo(unsigned int cantThreads);
 
  private:
-    ListaAtomica<hashMapPair> *tabla[HashMapConcurrente::cantLetras];
+    ListaAtomica<hashMapPair> * tabla[HashMapConcurrente::cantLetras];
 
     hashMapPair* buscar(std::string clave);
 
     static unsigned int hashIndex(std::string clave);
     
     std::mutex hash_mutex[cantLetras];
-
+    
     std::mutex mutex_insercion;
 };
 
