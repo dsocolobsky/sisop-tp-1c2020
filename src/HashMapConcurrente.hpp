@@ -8,6 +8,12 @@
 
 #include "ListaAtomica.hpp"
 
+
+struct thread_ctx {
+    unsigned int *letras;
+    std::mutex *mtx_letra;
+};
+
 typedef std::pair<std::string, unsigned int> hashMapPair;
 
 class HashMapConcurrente {
@@ -31,6 +37,8 @@ class HashMapConcurrente {
     hashMapPair* buscar(std::string clave);
 
     static unsigned int hashIndex(std::string clave);
+
+    void maximoPorThread(thread_ctx *ctx);
     
     std::mutex hash_mutex[cantLetras];
     
@@ -38,3 +46,4 @@ class HashMapConcurrente {
 };
 
 #endif  /* HMC_HPP */
+

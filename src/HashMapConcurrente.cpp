@@ -6,6 +6,7 @@
 #include <pthread.h>
 #include <mutex>
 #include <thread>
+#include <string>
 
 #include "HashMapConcurrente.hpp"
 
@@ -91,6 +92,18 @@ hashMapPair HashMapConcurrente::maximo() {
     hashMapPair *max = new hashMapPair();
     max->second = 0;
 
+    // Intento lockear todos los mutex
+    unsigned int letra = 0;
+    while(letra < HashMapConcurrente::cantLetras)
+    {
+        std::mutex *mtx = &(hash_mutex[letra]);
+        if(mtx->try_lock())
+        {
+            ++letra;
+        }
+    }
+
+    //Busco el máximo sin permitir inserciones en el medio
     for (unsigned int index = 0; index < HashMapConcurrente::cantLetras; index++) {
         for (
             auto it = tabla[index]->crearIt();
@@ -104,11 +117,52 @@ hashMapPair HashMapConcurrente::maximo() {
         }
     }
 
+    // Desbloqueo todos los mutex
+    for(unsigned int i = 0; i < HashMapConcurrente::cantLetras; ++i)
+    {
+        std::mutex *mtx = &(hash_mutex[i]);
+        mtx->unlock();
+    }
+
     return *max;
+}
+
+void HashMapConcurrente::maximoPorThread(thread_ctx *ctx) {
+    while(true)
+    {
+        while(!ctx->mtx_letra->try_lock()){};
+        if(*(ctx->letras) > 0)
+        {
+            (*(ctx->letras))--;
+        }
+        else
+        {
+            ctx->mtx_letra->unlock();
+            return;
+        }
+    }
 }
 
 hashMapPair HashMapConcurrente::maximoParalelo(unsigned int cantThreads) {
     // Completar (Ejercicio 3)
+
+    // Contexto de threads
+    std::mutex *mutex_letras = new std::mutex();
+    unsigned int letras_disponibles = HashMapConcurrente::cantLetras;
+    
+    //std::mutex * mutex_escritura;
+    //std::mutex * mutex_lectura;
+    hashMapPair max_seen{nullptr, 0};
+    //puntero_mutex * pm;
+    //pm.mu
+
+    std::thread threads[cantThreads];
+    for (unsigned int i = 0; i < cantThreads; i++) {
+        threads[i] = std::thread(&HashMapConcurrente::maximoPorThread,
+            this, new thread_ctx{&letras_disponibles, mutex_letras});
+    }
+
+    return max_seen;
 }
 
 
