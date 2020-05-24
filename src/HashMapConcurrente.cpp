@@ -128,16 +128,51 @@ hashMapPair HashMapConcurrente::maximo() {
 }
 
 void HashMapConcurrente::maximoPorThread(thread_ctx *ctx) {
-    unsigned int letra;
+    int letra;
+    hashMapPair maximoLocal;
+
     while (ctx->letras->load() >= 0) {
         letra = ctx->letras->fetch_sub(1, std::memory_order_relaxed);
         // Buscar el máximo de esa lista
         // Guardar el máximo de la lista en un puntero a "máximo" de maximoParalelo (atómico para que no se pise)
+
+        // Me fijo si la lista está vacía
+        //return;
+
+        //std::cout << "VOY A VER LA letra " << letra << "," << (char)(letra + 'a') << std::endl;
+
+        if(tabla[letra]->longitud() == 0) continue;
+
+        //std::cout << "LLEGUE ACA letra " << letra << "," << (char)(letra + 'a') << std::endl;
+
+        // Si la lista no está vacía, el máximo local es el primero (por ahora)
+        maximoLocal = tabla[letra]->iesimo(0);
+
+        // Itero desde el segundo elemento buscando otro potencial máximo local
+        for (int i = 1; i < tabla[letra]->longitud(); i++)
+        {
+            hashMapPair par = tabla[letra]->iesimo(i);
+            if (par.second > maximoLocal.second)
+            {
+                maximoLocal = par;
+            }
+        }
+
+        // Intentar acceder al mutex de maximo, y si es mayor el local => cambiarlo
+        while(!ctx->mtx_max->try_lock()) { /* Espero */ };
+
+        if (maximoLocal.second > ctx->maximoGlobal->second) {
+            *(ctx->maximoGlobal) = maximoLocal;
+        }
+        
+        ctx->mtx_max->unlock();
     }
 }
 
 hashMapPair HashMapConcurrente::maximoParalelo(unsigned int cantThreads) {
     // Completar (Ejercicio 3)
+
+    std::mutex max_mutex;
 
     // Intento lockear todos los mutex
     unsigned int letra = 0;
@@ -151,22 +186,18 @@ hashMapPair HashMapConcurrente::maximoParalelo(unsigned int cantThreads) {
     }
 
     // Contexto de threads
-    std::mutex *mutex_letras = new std::mutex();
-    std::atomic<unsigned int> letras_disponibles{HashMapConcurrente::cantLetras};
+    std::mutex mutex_letras;
+    std::atomic<int> letras_disponibles{25};
     
-    //std::mutex * mutex_escritura;
-    //std::mutex * mutex_lectura;
-    hashMapPair max_seen{nullptr, 0};
-    //puntero_mutex * pm;
-    //pm.mu-
+    hashMapPair max_seen{"caca", 1};
 
     std::thread threads[cantThreads];
     for (unsigned int i = 0; i < cantThreads; i++) {
         threads[i] = std::thread(&HashMapConcurrente::maximoPorThread,
-            this, new thread_ctx{&letras_disponibles, mutex_letras});
+            this, new thread_ctx{&letras_disponibles, &mutex_letras, &max_mutex, &max_seen});
     }
 
-
+    // Esperar a que terminen todos los hilos
     for (unsigned int i = 0; i < cantThreads; i++) {
         threads[i].join();
     }
@@ -198,3 +229,5 @@ hashMapPair* HashMapConcurrente::buscar(std::string clave) {
 /*
 Revisar TIME vs CHRONO
 */
+
+//TODO pegarle una leida a los metodos implementados y comentar
