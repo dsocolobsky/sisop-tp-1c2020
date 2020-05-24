@@ -10,7 +10,7 @@
 
 
 struct thread_ctx {
-    unsigned int *letras;
+    std::atomic<unsigned int> *letras;
     std::mutex *mtx_letra;
 };
 
