@@ -4,7 +4,9 @@
 #include <vector>
 #include <iostream>
 #include <fstream>
+#include <algorithm>
 #include <pthread.h>
+#include <thread>
 
 #include "CargarArchivos.hpp"
 
@@ -37,6 +39,14 @@ int cargarArchivo(
     return cant;
 }
 
+void cargarArchivoDeUnThread(HashMapConcurrente &hashMap, std::atomic<int> &pool, std::vector<std::string> &filePaths) {
+    int idx;
+    while (pool.load() >= 0) {
+        idx = pool.fetch_sub(1, std::memory_order_relaxed);
+        cargarArchivo(hashMap, filePaths[idx]);
+    }
+}
+
 
 void cargarMultiplesArchivos(
     HashMapConcurrente &hashMap,
@@ -50,6 +60,23 @@ void cargarMultiplesArchivos(
     // 3. ???
     // 4. Recursar gg wp
     // 5. Poner un café en un pueblito en japón y no ver una compu nunca más
+
+    //std::sort( filePaths.begin(), filePaths.end() );
+    filePaths.erase( std::unique( filePaths.begin(), filePaths.end() ), filePaths.end() );
+
+
+    std::atomic<int> cantFiles{filePaths.size() - 1};
+
+    
+    std::thread threads[cantThreads];
+    for (unsigned int i = 0; i < cantThreads; i++) {
+        threads[i] = std::thread(&cargarArchivoDeUnThread, std::ref(hashMap), std::ref(cantFiles), std::ref(filePaths));
+    }
+
+    // Esperar a que terminen todos los hilos
+    for (unsigned int i = 0; i < cantThreads; i++) {
+        threads[i].join();
+    }
 }
 
 #endif
