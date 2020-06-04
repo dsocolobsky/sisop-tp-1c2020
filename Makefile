@@ -1,5 +1,5 @@
 CXX = g++
-CXXFLAGS = -std=c++11 -Wall -ggdb
+CXXFLAGS = -std=c++11 -Wall -ggdb -O3
 LDFLAGS = -lpthread
 
 BUILD_DIR = ./build
