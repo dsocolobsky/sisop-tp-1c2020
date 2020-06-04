@@ -95,7 +95,7 @@ if not os.path.exists('mediciones'):
     os.mkdir('mediciones')
 
 if args.folder is None:
-    folder = 'mediciones/{}_{}'.format(args.maximo, datetime.now().strftime("%m_%d_%H%M%S"))
+    folder = 'mediciones/{}_{}'.format(args.maximo, args.testfile.split("/")[1] + "_testResults")
 else:
     folder = 'mediciones/{}'.format(args.folder)
 
