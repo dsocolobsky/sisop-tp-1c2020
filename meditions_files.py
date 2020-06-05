@@ -40,6 +40,7 @@ def run():
         for t in range(1,args.files+1):
             print(f'Testing {t} threads for files')
             cmd = f'./build/ContarPalabras {t} 1 {args.testfile}'
+            print(args.testfile)
             times = []
             for sample in range(args.samples):
                 cmd_result = run_cmd(cmd)
