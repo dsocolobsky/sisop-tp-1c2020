@@ -31,7 +31,8 @@ def run():
     filename = f'{folder}_files.csv'
 
     # Test run
-    cmd = f'./build/ContarPalabras 1 1 {args.testfile}'
+    cmd = f'./build/ContarPalabras 1 1 {tests_s}'
+    print(f'Voy a correr {cmd}')
     testres, _, testtime = run_cmd(cmd).split(',')
     print(f'Test run: {testres}, {testtime}')
 
@@ -39,7 +40,7 @@ def run():
         f.write('threads_files,time\n')
         for t in range(1,args.files+1):
             print(f'Testing {t} threads for files')
-            cmd = f'./build/ContarPalabras {t} 1 {args.testfile}'
+            cmd = f'./build/ContarPalabras {t} 1 {tests_s}'
             print(args.testfile)
             times = []
             for sample in range(args.samples):
@@ -99,6 +100,11 @@ if args.folder is None:
     folder = f'mediciones/files_{len(args.testfile)}f_{args.files}t_res'
 else:
     folder = f'mediciones/{args.folder}'
+
+
+tests_s = ''
+for t in args.testfile:
+    tests_s += (t + ' ')
 
 csvs = []
 filename = run()
