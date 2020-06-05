@@ -28,24 +28,24 @@ def run_cmd(cmd):
     return result
 
 def run():
-    filename = f'{folder}.csv'
+    filename = f'{folder}_files.csv'
 
     # Test run
     cmd = f'./build/ContarPalabras 1 1 {args.testfile}'
-    testres, testtime, _ = run_cmd(cmd).split(',')
+    testres, _, testtime = run_cmd(cmd).split(',')
     print(f'Test run: {testres}, {testtime}')
 
     with open(filename, 'w') as f:
-        f.write('threads_maximo,time\n')
-        for t in range(1,args.maximo+1):
-            print(f'Testing {t} threads')
-            cmd = f'./build/ContarPalabras 1 {t} {args.testfile}'
+        f.write('threads_files,time\n')
+        for t in range(1,args.files+1):
+            print(f'Testing {t} threads for files')
+            cmd = f'./build/ContarPalabras {t} 1 {args.testfile}'
             times = []
             for sample in range(args.samples):
                 cmd_result = run_cmd(cmd)
                 print(cmd_result)
                 try:
-                    res, time, _ = cmd_result.split(',')
+                    res, _, time = cmd_result.split(',')
                 except BaseException as e:
                     print(f"{e}")
                     continue
@@ -71,17 +71,17 @@ def graficar(filename):
     print(f'Cargando csv {filename}')
     df = pd.read_csv(filename)
     plt.figure()
-    plt.xticks(range(0, args.maximo+1))
-    plt.scatter(df['threads_maximo'], df['time'], c='g', alpha=0.5)
+    plt.xticks(range(0, args.files+1))
+    plt.scatter(df['threads_files'], df['time'], c='g', alpha=0.5)
     plt.savefig(f'{filename}.png')
 
 
 parser = argparse.ArgumentParser(description='Genera casos de tests, testea y hace mediciones del TP')
 
-parser.add_argument('-m', '--maximo', type=int, help='Threads para buscar maximo', default=1, nargs='?')
+parser.add_argument('-f', '--files', type=int, help='Threads para buscar files', default=1, nargs='?')
 parser.add_argument('-s', '--samples', type=int, default=2, help='Numero de muestras que tomar para cada testeo (default 2)')
 parser.add_argument('-o', '--folder', help='Nombre de la carpeta de la medicion SIN ESPACIOS (por default es la hora)')
-parser.add_argument('-t', '--testfile', help='Test file')
+parser.add_argument('-t', '--testfile', help='Test files, al menos una', nargs='+')
 parser.add_argument('-g', '--graficos', action='store_true', help='Escupe graficos en matplotlib')
 
 args = parser.parse_args()
@@ -94,9 +94,10 @@ if not os.path.exists('mediciones'):
     os.mkdir('mediciones')
 
 if args.folder is None:
-    folder = 'mediciones/{}_{}'.format(args.maximo, args.testfile.split("/")[1] + "_testResults")
+    fname = args.testfile[0].split("/")[1]
+    folder = f'mediciones/files_{len(args.testfile)}f_{args.files}t_res'
 else:
-    folder = 'mediciones/{}'.format(args.folder)
+    folder = f'mediciones/{args.folder}'
 
 csvs = []
 filename = run()

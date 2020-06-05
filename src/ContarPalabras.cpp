@@ -28,14 +28,18 @@ int main(int argc, char **argv) {
     }
 
     HashMapConcurrente hashMap = HashMapConcurrente();
+
+    auto start_files = std::chrono::steady_clock::now();
     cargarMultiplesArchivos(hashMap, cantThreadsLectura, filePaths);
+    auto end_files = std::chrono::steady_clock::now();
+    double time_files = std::chrono::duration<double, std::milli>(end_files - start_files).count();
 
     auto start = std::chrono::steady_clock::now();
     auto maximo = hashMap.maximoParalelo(cantThreadsMaximo);
     auto end = std::chrono::steady_clock::now();
     double total_time = std::chrono::duration<double, std::milli>(end - start).count();
 
-    std::cout << maximo.second << ',' << total_time << std::endl;
+    std::cout << maximo.second << ',' << total_time << ',' << time_files << std::endl;
 
     return 0;
 }
