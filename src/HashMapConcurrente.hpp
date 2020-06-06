@@ -13,7 +13,6 @@ typedef std::pair<std::string, unsigned int> hashMapPair;
 
 struct thread_ctx {
     std::atomic<int> *letras;
-    std::mutex *mtx_letra;
     std::mutex *mtx_max;
     hashMapPair *maximoGlobal;
 };

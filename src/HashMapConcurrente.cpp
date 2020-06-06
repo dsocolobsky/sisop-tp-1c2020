@@ -186,15 +186,14 @@ hashMapPair HashMapConcurrente::maximoParalelo(unsigned int cantThreads) {
     }
 
     // Contexto de threads
-    std::mutex mutex_letras;
     std::atomic<int> letras_disponibles{25};
     
-    hashMapPair max_seen{"caca", 1};
+    hashMapPair max_seen{"aaa", 1};
 
     std::thread threads[cantThreads];
     for (unsigned int i = 0; i < cantThreads; i++) {
         threads[i] = std::thread(&HashMapConcurrente::maximoPorThread,
-            this, new thread_ctx{&letras_disponibles, &mutex_letras, &max_mutex, &max_seen});
+            this, new thread_ctx{&letras_disponibles, &max_mutex, &max_seen});
     }
 
     // Esperar a que terminen todos los hilos
