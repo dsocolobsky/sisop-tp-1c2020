@@ -89,8 +89,8 @@ unsigned int HashMapConcurrente::valor(std::string clave) {
 }
 
 hashMapPair HashMapConcurrente::maximo() {
-    hashMapPair *max = new hashMapPair();
-    max->second = 0;
+    hashMapPair max{};
+    max.second = 0;
 
     // Intento lockear todos los mutex
     unsigned int letra = 0;
@@ -110,9 +110,9 @@ hashMapPair HashMapConcurrente::maximo() {
             it.haySiguiente();
             it.avanzar()
         ) {
-            if (it.siguiente().second > max->second) {
-                max->first = it.siguiente().first;
-                max->second = it.siguiente().second;
+            if (it.siguiente().second > max.second) {
+                max.first = it.siguiente().first;
+                max.second = it.siguiente().second;
             }
         }
     }
@@ -124,7 +124,7 @@ hashMapPair HashMapConcurrente::maximo() {
         mtx->unlock();
     }
 
-    return *max;
+    return max;
 }
 
 void HashMapConcurrente::maximoPorThread(thread_ctx *ctx) {
@@ -136,14 +136,7 @@ void HashMapConcurrente::maximoPorThread(thread_ctx *ctx) {
         // Buscar el máximo de esa lista
         // Guardar el máximo de la lista en un puntero a "máximo" de maximoParalelo (atómico para que no se pise)
 
-        // Me fijo si la lista está vacía
-        //return;
-
-        //std::cout << "VOY A VER LA letra " << letra << "," << (char)(letra + 'a') << std::endl;
-
         if(tabla[letra]->longitud() == 0) continue;
-
-        //std::cout << "LLEGUE ACA letra " << letra << "," << (char)(letra + 'a') << std::endl;
 
         // Si la lista no está vacía, el máximo local es el primero (por ahora)
         maximoLocal = tabla[letra]->iesimo(0);
@@ -167,6 +160,7 @@ void HashMapConcurrente::maximoPorThread(thread_ctx *ctx) {
         
         ctx->mtx_max->unlock();
     }
+    delete ctx;
 }
 
 hashMapPair HashMapConcurrente::maximoParalelo(unsigned int cantThreads) {
@@ -224,9 +218,3 @@ hashMapPair* HashMapConcurrente::buscar(std::string clave) {
 }
 
 #endif
-
-/*
-Revisar TIME vs CHRONO
-*/
-
-//TODO pegarle una leida a los metodos implementados y comentar
