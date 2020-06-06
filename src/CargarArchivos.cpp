@@ -53,15 +53,7 @@ void cargarMultiplesArchivos(
     unsigned int cantThreads,
     std::vector<std::string> filePaths
 ) {
-    // Completar (Ejercicio 4)
-    // TODO: 
-    // 1. Filtrar repetidos
-    // 2. Cargar con pool de archivos como en el punto 3.
-    // 3. ???
-    // 4. Recursar gg wp
-    // 5. Poner un café en un pueblito en japón y no ver una compu nunca más
-
-    //std::sort( filePaths.begin(), filePaths.end() );
+    // Borramos cualquier tipo de fichero duplicado que nos hayan pasado.
     filePaths.erase( std::unique( filePaths.begin(), filePaths.end() ), filePaths.end() );
 
 
