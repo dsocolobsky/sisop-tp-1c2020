@@ -133,8 +133,6 @@ void HashMapConcurrente::maximoPorThread(thread_ctx *ctx) {
 
     while (ctx->letras->load() >= 0) {
         letra = ctx->letras->fetch_sub(1, std::memory_order_relaxed);
-        // Buscar el máximo de esa lista
-        // Guardar el máximo de la lista en un puntero a "máximo" de maximoParalelo (atómico para que no se pise)
 
         if(tabla[letra]->longitud() == 0) continue;
 
@@ -182,7 +180,7 @@ hashMapPair HashMapConcurrente::maximoParalelo(unsigned int cantThreads) {
     // Contexto de threads
     std::atomic<int> letras_disponibles{25};
     
-    hashMapPair max_seen{"aaa", 1};
+    hashMapPair max_seen{"aaa", 0};
 
     std::thread threads[cantThreads];
     for (unsigned int i = 0; i < cantThreads; i++) {
