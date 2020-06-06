@@ -5,12 +5,12 @@ $corpus_words = explode("\n", $corpus_text);
 echo count($corpus_words) . " words loaded.\n";
 
 # Sizes wanted
-$sizes = array(50000);
+$sizes = array(10000);
 
 # Generate 100 files for each test case
 foreach($sizes as $size)
 {
-    for($i = 0; $i < 50; ++$i)
+    for($i = 0; $i < 20; ++$i)
     {
         $file_text = "";
         $file_name = "test_" . $size . "_$i";
